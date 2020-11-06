@@ -1,0 +1,339 @@
+unit MainU;
+
+interface
+
+uses
+  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants,
+  System.Classes, Vcl.Graphics,
+  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.ComCtrls, Vcl.Menus, Vcl.StdCtrls,
+  Vcl.StdActns, Vcl.ActnList, System.Actions, IniFiles,
+  Vcl.ActnMan, Vcl.PlatformDefaultStyleActnCtrls;
+
+type
+  TFormMain = class(TForm)
+    StatusBar1: TStatusBar;
+    MainMenu1: TMainMenu;
+    File1: TMenuItem;
+    Edit1: TMenuItem;
+    Format1: TMenuItem;
+    New1: TMenuItem;
+    Open1: TMenuItem;
+    Save1: TMenuItem;
+    SaveAs1: TMenuItem;
+    N1: TMenuItem;
+    PageSetup1: TMenuItem;
+    PrintSetup1: TMenuItem;
+    Exit1: TMenuItem;
+    Undo1: TMenuItem;
+    N2: TMenuItem;
+    Cut1: TMenuItem;
+    Copy1: TMenuItem;
+    Paste1: TMenuItem;
+    Delete1: TMenuItem;
+    N3: TMenuItem;
+    Find1: TMenuItem;
+    Replace1: TMenuItem;
+    N4: TMenuItem;
+    SelectAll1: TMenuItem;
+    WordWrap1: TMenuItem;
+    Font1: TMenuItem;
+    OpenDialog1: TOpenDialog;
+    Memo1: TMemo;
+    FindDialog1: TFindDialog;
+    FontDialog1: TFontDialog;
+    SaveDialog1: TSaveDialog;
+    procedure EditFind1Execute(Sender: TObject);
+    procedure Memo1Change(Sender: TObject);
+    procedure FileSave1Execute(Sender: TObject);
+    procedure FileOpen1Execute(Sender: TObject);
+    procedure FormCloseQuery(Sender: TObject; var CanClose: Boolean);
+    procedure FileSaveAs1Execute(Sender: TObject);
+    procedure FileNew1Execute(Sender: TObject);
+    procedure EditSelectAll1Execute(Sender: TObject);
+    procedure FindDialog1Find(Sender: TObject);
+    procedure WordWrap1Click(Sender: TObject);
+    procedure Font1Click(Sender: TObject);
+    procedure FormCreate(Sender: TObject);
+    procedure FormClose(Sender: TObject; var Action: TCloseAction);
+    procedure Exit1Click(Sender: TObject);
+  private
+    { Private declarations }
+    FOpenedFile: string;
+    FSelPos: integer;
+    function DocumentChanged: Boolean;
+    procedure LoadIni;
+    procedure CloseIni;
+  public
+    { Public declarations }
+  end;
+
+var
+  FormMain: TFormMain;
+
+implementation
+
+uses System.UITypes;
+
+{$R *.dfm}
+{ TFormMain }
+
+procedure TFormMain.LoadIni;
+var
+  AIniFile: TIniFile;
+  myFont: TFont;
+begin
+  try
+    myFont:=TFont.Create;
+    AIniFile := TIniFile.Create(ExtractFilePath(Application.EXEName) +
+      'config.ini');
+    with AIniFile do
+    begin
+      FormMain.Left := AIniFile.ReadInteger('Config', 'Left', 10);
+      FormMain.Top := AIniFile.ReadInteger('Config', 'Top', 10);
+      FormMain.Width := AIniFile.ReadInteger('Config', 'Width', 613);
+      FormMain.Height := AIniFile.ReadInteger('Config', 'Height', 496);
+      myFont.Size := AIniFile.ReadInteger('Config', 'FontSize', 12);
+      myFont.Name := AIniFile.ReadString('Config', 'FontName', 'Consolas');
+    end;
+  finally
+    Memo1.Font:=myFont;
+    AIniFile.Free;
+    myFont.Free;
+  end;
+end;
+
+procedure TFormMain.CloseIni;
+var
+  AIniFile: TIniFile;
+begin
+  try
+    AIniFile := TIniFile.Create(ExtractFilePath(Application.EXEName) +
+      'config.ini');
+    with AIniFile do
+    begin
+      WriteInteger('Config', 'Left', Left);
+      WriteInteger('Config', 'Top', Top);
+      WriteInteger('Config', 'Width', Width);
+      WriteInteger('Config', 'Height', Height);
+      WriteInteger('Config', 'FontSize', Memo1.Font.Size);
+      WriteString('Config', 'FontName', Memo1.Font.Name);
+    end;
+  finally
+    AIniFile.Free;
+  end;
+end;
+
+function TFormMain.DocumentChanged: Boolean;
+var
+  s: string;
+begin
+  if FOpenedFile <> '' then
+    s := FOpenedFile
+  else
+    s := 'this file';
+  Result := True;
+  if Memo1.Modified then
+  begin
+    case MessageDlg('Do you want to save the changes to ' + s + '?', mtWarning,
+      mbYesNoCancel, 0) of
+      mrYes:
+        FileSave1Execute(self);
+      mrCancel:
+        Result := False;
+    end;
+  end;
+end;
+
+procedure TFormMain.EditFind1Execute(Sender: TObject);
+begin
+  FSelPos := 0;
+  FindDialog1.Execute;
+end;
+
+procedure TFormMain.EditSelectAll1Execute(Sender: TObject);
+begin
+  Memo1.SelectAll;
+end;
+
+procedure TFormMain.Exit1Click(Sender: TObject);
+begin
+  Close;
+end;
+
+procedure TFormMain.FileNew1Execute(Sender: TObject);
+begin
+  if Memo1.Text <> '' then
+    case MessageDlg('Do you want to save the changes to this file?', mtWarning,
+      mbYesNoCancel, 0) of
+      mrYes:
+        FileSave1Execute(self);
+    end;
+
+  Memo1.Lines.Clear;
+  FOpenedFile := '';
+end;
+
+
+procedure TFormMain.FileOpen1Execute(Sender: TObject);
+begin
+  OpenDialog1.Execute;
+  if OpenDialog1.FileName <> '' then
+  begin
+    Memo1.Lines.LoadFromFile(OpenDialog1.FileName);
+    FOpenedFile := OpenDialog1.FileName;
+  end;
+end;
+
+procedure TFormMain.FileSave1Execute(Sender: TObject);
+begin
+  if FOpenedFile <> '' then
+    Memo1.Lines.SaveToFile(FOpenedFile)
+  else
+    self.FileSaveAs1Execute(Sender);
+end;
+
+
+procedure TFormMain.FileSaveAs1Execute(Sender: TObject);
+begin
+  SaveDialog1.Execute;
+  if SaveDialog1.FileName <> '' then // checking to assure user selected a file
+    Memo1.Lines.SaveToFile(SaveDialog1.FileName);
+end;
+
+procedure TFormMain.FindDialog1Find(Sender: TObject);
+var
+  s: string;
+  startpos: integer;
+begin
+  with TFindDialog(Sender) do
+  begin
+    { If the stored position is 0 this cannot be a find next. }
+    if FSelPos = 0 then
+      Options := Options - [frFindNext];
+
+    { Figure out where to start the search and get the corresponding
+      text from the memo. }
+    if frFindNext in Options then
+    begin
+      { This is a find next, start after the end of the last found word. }
+      startpos := FSelPos + Length(Findtext);
+      s := Copy(Memo1.Lines.Text, startpos, MaxInt);
+    end
+    else
+    begin
+      { This is a find first, start at the, well, start. }
+      s := Memo1.Lines.Text;
+      startpos := 1;
+    end;
+    { Perform a global case-sensitive search for FindText in S }
+    FSelPos := Pos(Findtext, s);
+    if FSelPos > 0 then
+    begin
+      { Found something, correct position for the location of the start
+        of search. }
+      FSelPos := FSelPos + startpos - 1;
+      Memo1.SelStart := FSelPos - 1;
+      Memo1.SelLength := Length(Findtext);
+      Memo1.SetFocus;
+    end
+    else
+    begin
+      { No joy, show a message. }
+      if frFindNext in Options then
+        s := Concat('There are no further occurences of “', Findtext,
+          '” in Memo1.')
+      else
+        s := Concat('Could not find “', Findtext, '” in Memo1.');
+      MessageDlg(s, mtError, [mbOK], 0);
+    end;
+  end;
+end;
+
+procedure TFormMain.Font1Click(Sender: TObject);
+begin
+  FontDialog1.Font.Name := Memo1.Font.Name;
+  FontDialog1.Font.Size:=Memo1.Font.Size;
+  FontDialog1.Font.Style:=Memo1.Font.Style;
+  if FontDialog1.Execute then
+    Memo1.Font := FontDialog1.Font;
+end;
+
+procedure TFormMain.FormClose(Sender: TObject; var Action: TCloseAction);
+begin
+  CloseIni;
+end;
+
+procedure TFormMain.FormCloseQuery(Sender: TObject; var CanClose: Boolean);
+begin
+  CanClose := DocumentChanged;
+end;
+
+procedure TFormMain.FormCreate(Sender: TObject);
+begin
+  LoadIni;
+  // Make sure WordWrap menu item properly checked
+  WordWrap1.Checked := Memo1.WordWrap;
+end;
+
+procedure TFormMain.Memo1Change(Sender: TObject);
+// https://stackoverflow.com/questions/64669235/how-to-accurately-count-words-in-a-memo
+var
+  // wordSeparatorSet: Set of Char;
+  count: integer;
+  i: integer;
+  s: string;
+  inWord: Boolean;
+begin
+  // wordSeparatorSet := [#13, #10, #32]; // CR, LF, space
+  count := 0;
+  s := Memo1.Text;
+  inWord := False;
+
+  for i := 1 to Length(s) do
+  begin
+    if inWord = True then
+    begin
+      // if s[i] in wordSeparatorSet then
+      if CharInSet(s[i], [#13, #10, #32]) then
+
+        inWord := False;
+    end
+    else
+    begin
+      if not(CharInSet(s[i], [#13, #10, #32])) then
+      begin
+        inWord := True;
+        Inc(count);
+      end;
+    end;
+
+  end;
+
+  // for i := 1 to Length(s) do
+  // begin
+  // // if the char is a delimiter, you're at the end of a word; increase the count
+  // if ((s[i] in wordSeparatorSet) and (inWord=True)) then
+  // begin
+  // Inc(count);
+  // inWord := False;
+  // end
+  // else
+  // // the char is not a delimiter, so you're in a word
+  // begin
+  // inWord := True;
+  // end;
+  // end;
+  // // OK, all done counting. If you're still inside a word, don't forget to count it too
+  // if inWord then
+  // Inc(count);
+
+  StatusBar1.Panels[0].Text := 'Words: ' + IntToStr(count);
+end;
+
+procedure TFormMain.WordWrap1Click(Sender: TObject);
+begin
+  Memo1.WordWrap := not Memo1.WordWrap;
+  WordWrap1.Checked := Memo1.WordWrap;
+end;
+
+end.
