@@ -38,8 +38,6 @@ object FormMain: TFormMain
     Font.Height = -19
     Font.Name = 'Source Code Pro Medium'
     Font.Style = []
-    Lines.Strings = (
-      'Memo1')
     ParentFont = False
     ScrollBars = ssVertical
     TabOrder = 1
