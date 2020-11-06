@@ -42,20 +42,36 @@ type
     FindDialog1: TFindDialog;
     FontDialog1: TFontDialog;
     SaveDialog1: TSaveDialog;
-    procedure EditFind1Execute(Sender: TObject);
-    procedure Memo1Change(Sender: TObject);
-    procedure FileSave1Execute(Sender: TObject);
-    procedure FileOpen1Execute(Sender: TObject);
-    procedure FormCloseQuery(Sender: TObject; var CanClose: Boolean);
-    procedure FileSaveAs1Execute(Sender: TObject);
-    procedure FileNew1Execute(Sender: TObject);
-    procedure EditSelectAll1Execute(Sender: TObject);
-    procedure FindDialog1Find(Sender: TObject);
-    procedure WordWrap1Click(Sender: TObject);
-    procedure Font1Click(Sender: TObject);
-    procedure FormCreate(Sender: TObject);
+    ActionList1: TActionList;
+    ExitAction: TAction;
+    EditCut1: TEditCut;
+    EditCopy1: TEditCopy;
+    EditPaste1: TEditPaste;
+    EditSelectAll1: TEditSelectAll;
+    EditUndo1: TEditUndo;
+    EditDelete1: TEditDelete;
+    OpenAction: TAction;
+    WordWrapAction: TAction;
+    NewAction: TAction;
+    SaveAction: TAction;
+    SaveAsAction: TAction;
+    FilePageSetup1: TFilePageSetup;
+    FilePrintSetup1: TFilePrintSetup;
+    FontSelectAction: TAction;
+    FindAction: TAction;
+    procedure ExitActionExecute(Sender: TObject);
+    procedure OpenActionExecute(Sender: TObject);
+    procedure NewActionExecute(Sender: TObject);
+    procedure SaveActionExecute(Sender: TObject);
+    procedure SaveAsActionExecute(Sender: TObject);
+    procedure WordWrapActionExecute(Sender: TObject);
+    procedure FontSelectActionExecute(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
-    procedure Exit1Click(Sender: TObject);
+    procedure FormCloseQuery(Sender: TObject; var CanClose: Boolean);
+    procedure FormCreate(Sender: TObject);
+    procedure Memo1Change(Sender: TObject);
+    procedure FindActionExecute(Sender: TObject);
+    procedure FindDialog1Find(Sender: TObject);
   private
     { Private declarations }
     FOpenedFile: string;
@@ -77,52 +93,6 @@ uses System.UITypes;
 {$R *.dfm}
 { TFormMain }
 
-procedure TFormMain.LoadIni;
-var
-  AIniFile: TIniFile;
-  myFont: TFont;
-begin
-  try
-    myFont:=TFont.Create;
-    AIniFile := TIniFile.Create(ExtractFilePath(Application.EXEName) +
-      'config.ini');
-    with AIniFile do
-    begin
-      FormMain.Left := AIniFile.ReadInteger('Config', 'Left', 10);
-      FormMain.Top := AIniFile.ReadInteger('Config', 'Top', 10);
-      FormMain.Width := AIniFile.ReadInteger('Config', 'Width', 613);
-      FormMain.Height := AIniFile.ReadInteger('Config', 'Height', 496);
-      myFont.Size := AIniFile.ReadInteger('Config', 'FontSize', 12);
-      myFont.Name := AIniFile.ReadString('Config', 'FontName', 'Consolas');
-    end;
-  finally
-    Memo1.Font:=myFont;
-    AIniFile.Free;
-    myFont.Free;
-  end;
-end;
-
-procedure TFormMain.CloseIni;
-var
-  AIniFile: TIniFile;
-begin
-  try
-    AIniFile := TIniFile.Create(ExtractFilePath(Application.EXEName) +
-      'config.ini');
-    with AIniFile do
-    begin
-      WriteInteger('Config', 'Left', Left);
-      WriteInteger('Config', 'Top', Top);
-      WriteInteger('Config', 'Width', Width);
-      WriteInteger('Config', 'Height', Height);
-      WriteInteger('Config', 'FontSize', Memo1.Font.Size);
-      WriteString('Config', 'FontName', Memo1.Font.Name);
-    end;
-  finally
-    AIniFile.Free;
-  end;
-end;
-
 function TFormMain.DocumentChanged: Boolean;
 var
   s: string;
@@ -137,70 +107,26 @@ begin
     case MessageDlg('Do you want to save the changes to ' + s + '?', mtWarning,
       mbYesNoCancel, 0) of
       mrYes:
-        FileSave1Execute(self);
+        SaveActionExecute(self);
       mrCancel:
         Result := False;
     end;
   end;
 end;
 
-procedure TFormMain.EditFind1Execute(Sender: TObject);
+procedure TFormMain.ExitActionExecute(Sender: TObject);
 begin
-  FSelPos := 0;
+  self.Close;
+end;
+
+procedure TFormMain.FindActionExecute(Sender: TObject);
+begin
+FSelPos := 0;
   FindDialog1.Execute;
 end;
 
-procedure TFormMain.EditSelectAll1Execute(Sender: TObject);
-begin
-  Memo1.SelectAll;
-end;
-
-procedure TFormMain.Exit1Click(Sender: TObject);
-begin
-  Close;
-end;
-
-procedure TFormMain.FileNew1Execute(Sender: TObject);
-begin
-  if Memo1.Text <> '' then
-    case MessageDlg('Do you want to save the changes to this file?', mtWarning,
-      mbYesNoCancel, 0) of
-      mrYes:
-        FileSave1Execute(self);
-    end;
-
-  Memo1.Lines.Clear;
-  FOpenedFile := '';
-end;
-
-
-procedure TFormMain.FileOpen1Execute(Sender: TObject);
-begin
-  OpenDialog1.Execute;
-  if OpenDialog1.FileName <> '' then
-  begin
-    Memo1.Lines.LoadFromFile(OpenDialog1.FileName);
-    FOpenedFile := OpenDialog1.FileName;
-  end;
-end;
-
-procedure TFormMain.FileSave1Execute(Sender: TObject);
-begin
-  if FOpenedFile <> '' then
-    Memo1.Lines.SaveToFile(FOpenedFile)
-  else
-    self.FileSaveAs1Execute(Sender);
-end;
-
-
-procedure TFormMain.FileSaveAs1Execute(Sender: TObject);
-begin
-  SaveDialog1.Execute;
-  if SaveDialog1.FileName <> '' then // checking to assure user selected a file
-    Memo1.Lines.SaveToFile(SaveDialog1.FileName);
-end;
-
 procedure TFormMain.FindDialog1Find(Sender: TObject);
+//http://www.delphigroups.info/2/09/310962.html
 var
   s: string;
   startpos: integer;
@@ -249,9 +175,9 @@ begin
   end;
 end;
 
-procedure TFormMain.Font1Click(Sender: TObject);
+procedure TFormMain.FontSelectActionExecute(Sender: TObject);
 begin
-  FontDialog1.Font.Name := Memo1.Font.Name;
+FontDialog1.Font.Name := Memo1.Font.Name;
   FontDialog1.Font.Size:=Memo1.Font.Size;
   FontDialog1.Font.Style:=Memo1.Font.Style;
   if FontDialog1.Execute then
@@ -260,19 +186,44 @@ end;
 
 procedure TFormMain.FormClose(Sender: TObject; var Action: TCloseAction);
 begin
-  CloseIni;
+CloseIni;
 end;
 
 procedure TFormMain.FormCloseQuery(Sender: TObject; var CanClose: Boolean);
 begin
-  CanClose := DocumentChanged;
+CanClose := DocumentChanged;
 end;
 
 procedure TFormMain.FormCreate(Sender: TObject);
 begin
-  LoadIni;
+LoadIni;
   // Make sure WordWrap menu item properly checked
   WordWrap1.Checked := Memo1.WordWrap;
+end;
+
+procedure TFormMain.LoadIni;
+var
+  AIniFile: TIniFile;
+  myFont: TFont;
+begin
+  try
+    myFont := TFont.Create;
+    AIniFile := TIniFile.Create(ExtractFilePath(Application.EXEName) +
+      'config.ini');
+    with AIniFile do
+    begin
+      FormMain.Left := AIniFile.ReadInteger('Config', 'Left', 10);
+      FormMain.Top := AIniFile.ReadInteger('Config', 'Top', 10);
+      FormMain.Width := AIniFile.ReadInteger('Config', 'Width', 613);
+      FormMain.Height := AIniFile.ReadInteger('Config', 'Height', 496);
+      myFont.Size := AIniFile.ReadInteger('Config', 'FontSize', 12);
+      myFont.Name := AIniFile.ReadString('Config', 'FontName', 'Consolas');
+    end;
+  finally
+    Memo1.Font := myFont;
+    AIniFile.Free;
+    myFont.Free;
+  end;
 end;
 
 procedure TFormMain.Memo1Change(Sender: TObject);
@@ -330,10 +281,70 @@ begin
   StatusBar1.Panels[0].Text := 'Words: ' + IntToStr(count);
 end;
 
-procedure TFormMain.WordWrap1Click(Sender: TObject);
+procedure TFormMain.NewActionExecute(Sender: TObject);
+begin
+   if Memo1.Text <> '' then
+    case MessageDlg('Do you want to save the changes to this file?', mtWarning,
+      mbYesNoCancel, 0) of
+      mrYes:
+        SaveAsActionExecute(self);
+    end;
+
+  Memo1.Lines.Clear;
+  FOpenedFile := '';
+end;
+
+procedure TFormMain.OpenActionExecute(Sender: TObject);
+begin
+   self.DocumentChanged;
+   OpenDialog1.Execute;
+  if OpenDialog1.FileName <> '' then
+  begin
+    Memo1.Lines.LoadFromFile(OpenDialog1.FileName);
+    FOpenedFile := OpenDialog1.FileName;
+  end;
+end;
+
+procedure TFormMain.SaveActionExecute(Sender: TObject);
+begin
+  if FOpenedFile <> '' then
+    Memo1.Lines.SaveToFile(FOpenedFile)
+  else
+    self.SaveAsActionExecute(Sender);
+end;
+
+procedure TFormMain.SaveAsActionExecute(Sender: TObject);
+begin
+   SaveDialog1.Execute;
+  if SaveDialog1.FileName <> '' then // checking to assure user selected a file
+    Memo1.Lines.SaveToFile(SaveDialog1.FileName);
+end;
+
+procedure TFormMain.WordWrapActionExecute(Sender: TObject);
 begin
   Memo1.WordWrap := not Memo1.WordWrap;
   WordWrap1.Checked := Memo1.WordWrap;
+end;
+
+procedure TFormMain.CloseIni;
+var
+  AIniFile: TIniFile;
+begin
+  try
+    AIniFile := TIniFile.Create(ExtractFilePath(Application.EXEName) +
+      'config.ini');
+    with AIniFile do
+    begin
+      WriteInteger('Config', 'Left', Left);
+      WriteInteger('Config', 'Top', Top);
+      WriteInteger('Config', 'Width', Width);
+      WriteInteger('Config', 'Height', Height);
+      WriteInteger('Config', 'FontSize', Memo1.Font.Size);
+      WriteString('Config', 'FontName', Memo1.Font.Name);
+    end;
+  finally
+    AIniFile.Free;
+  end;
 end;
 
 end.

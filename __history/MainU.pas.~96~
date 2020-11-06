@@ -1,0 +1,130 @@
+unit MainU;
+
+interface
+
+uses
+  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants,
+  System.Classes, Vcl.Graphics,
+  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.ComCtrls, Vcl.Menus, Vcl.StdCtrls,
+  Vcl.StdActns, Vcl.ActnList, System.Actions, IniFiles,
+  Vcl.ActnMan, Vcl.PlatformDefaultStyleActnCtrls;
+
+type
+  TFormMain = class(TForm)
+    StatusBar1: TStatusBar;
+    MainMenu1: TMainMenu;
+    File1: TMenuItem;
+    Edit1: TMenuItem;
+    Format1: TMenuItem;
+    New1: TMenuItem;
+    Open1: TMenuItem;
+    Save1: TMenuItem;
+    SaveAs1: TMenuItem;
+    N1: TMenuItem;
+    PageSetup1: TMenuItem;
+    PrintSetup1: TMenuItem;
+    Exit1: TMenuItem;
+    Undo1: TMenuItem;
+    N2: TMenuItem;
+    Cut1: TMenuItem;
+    Copy1: TMenuItem;
+    Paste1: TMenuItem;
+    Delete1: TMenuItem;
+    N3: TMenuItem;
+    Find1: TMenuItem;
+    Replace1: TMenuItem;
+    N4: TMenuItem;
+    SelectAll1: TMenuItem;
+    WordWrap1: TMenuItem;
+    Font1: TMenuItem;
+    OpenDialog1: TOpenDialog;
+    Memo1: TMemo;
+    FindDialog1: TFindDialog;
+    FontDialog1: TFontDialog;
+    SaveDialog1: TSaveDialog;
+    ActionList1: TActionList;
+    ExitAction: TAction;
+    EditCut1: TEditCut;
+    EditCopy1: TEditCopy;
+    EditPaste1: TEditPaste;
+    EditSelectAll1: TEditSelectAll;
+    EditUndo1: TEditUndo;
+    EditDelete1: TEditDelete;
+    FileOpen1: TFileOpen;
+    FileSaveAs1: TFileSaveAs;
+    procedure ExitActionExecute(Sender: TObject);
+  private
+    { Private declarations }
+    FOpenedFile: string;
+    FSelPos: integer;
+    procedure LoadIni;
+    procedure CloseIni;
+  public
+    { Public declarations }
+  end;
+
+var
+  FormMain: TFormMain;
+
+implementation
+
+uses System.UITypes;
+
+{$R *.dfm}
+{ TFormMain }
+
+procedure TFormMain.ExitActionExecute(Sender: TObject);
+begin
+  self.Close;
+end;
+
+
+
+procedure TFormMain.LoadIni;
+var
+  AIniFile: TIniFile;
+  myFont: TFont;
+begin
+  try
+    myFont:=TFont.Create;
+    AIniFile := TIniFile.Create(ExtractFilePath(Application.EXEName) +
+      'config.ini');
+    with AIniFile do
+    begin
+      FormMain.Left := AIniFile.ReadInteger('Config', 'Left', 10);
+      FormMain.Top := AIniFile.ReadInteger('Config', 'Top', 10);
+      FormMain.Width := AIniFile.ReadInteger('Config', 'Width', 613);
+      FormMain.Height := AIniFile.ReadInteger('Config', 'Height', 496);
+      myFont.Size := AIniFile.ReadInteger('Config', 'FontSize', 12);
+      myFont.Name := AIniFile.ReadString('Config', 'FontName', 'Consolas');
+    end;
+  finally
+    Memo1.Font:=myFont;
+    AIniFile.Free;
+    myFont.Free;
+  end;
+end;
+
+procedure TFormMain.CloseIni;
+var
+  AIniFile: TIniFile;
+begin
+  try
+    AIniFile := TIniFile.Create(ExtractFilePath(Application.EXEName) +
+      'config.ini');
+    with AIniFile do
+    begin
+      WriteInteger('Config', 'Left', Left);
+      WriteInteger('Config', 'Top', Top);
+      WriteInteger('Config', 'Width', Width);
+      WriteInteger('Config', 'Height', Height);
+      WriteInteger('Config', 'FontSize', Memo1.Font.Size);
+      WriteString('Config', 'FontName', Memo1.Font.Name);
+    end;
+  finally
+    AIniFile.Free;
+  end;
+end;
+
+
+end.

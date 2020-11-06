@@ -51,91 +51,55 @@ object FormMain: TFormMain
     object File1: TMenuItem
       Caption = '&File'
       object New1: TMenuItem
-        Caption = 'New ...'
-        ShortCut = 16462
-        OnClick = FileNew1Execute
+        Action = NewAction
       end
       object Open1: TMenuItem
-        Caption = '&Open...'
-        Hint = 'Open|Opens an existing file'
-        ImageIndex = 7
-        ShortCut = 16463
-        OnClick = FileOpen1Execute
+        Action = OpenAction
       end
       object Save1: TMenuItem
-        Caption = 'Save'
-        OnClick = FileSave1Execute
+        Action = SaveAction
       end
       object SaveAs1: TMenuItem
-        Caption = 'Save &As...'
-        Hint = 'Save As|Saves the active file with a new name'
-        ImageIndex = 30
-        OnClick = FileSaveAs1Execute
+        Action = SaveAsAction
       end
       object N1: TMenuItem
-        Caption = '&Open...'
-        Hint = 'Open|Opens an existing file'
-        ImageIndex = 7
-        ShortCut = 16463
+        Action = OpenAction
       end
       object PageSetup1: TMenuItem
-        Caption = 'Page Set&up...'
+        Action = FilePageSetup1
       end
       object PrintSetup1: TMenuItem
-        Caption = 'Print Set&up...'
-        Hint = 'Print Setup'
+        Action = FilePrintSetup1
       end
       object Exit1: TMenuItem
-        Caption = 'E&xit'
-        Hint = 'Exit|Quits the application'
-        ImageIndex = 43
-        OnClick = Exit1Click
+        Action = ExitAction
       end
     end
     object Edit1: TMenuItem
       Caption = '&Edit'
       object Undo1: TMenuItem
-        Caption = '&Undo'
-        Hint = 'Undo|Reverts the last action'
-        ImageIndex = 3
-        ShortCut = 16474
+        Action = EditUndo1
       end
       object N2: TMenuItem
         Caption = '-'
       end
       object Cut1: TMenuItem
-        Caption = 'Cu&t'
-        Hint = 'Cut|Cuts the selection and puts it on the Clipboard'
-        ImageIndex = 0
-        ShortCut = 16472
+        Action = EditCut1
       end
       object Copy1: TMenuItem
-        Caption = '&Copy'
-        Hint = 'Copy|Copies the selection and puts it on the Clipboard'
-        ImageIndex = 1
-        ShortCut = 16451
+        Action = EditCopy1
       end
       object Paste1: TMenuItem
-        Caption = '&Paste'
-        Hint = 'Paste|Inserts Clipboard contents'
-        ImageIndex = 2
-        ShortCut = 16470
+        Action = EditPaste1
       end
       object Delete1: TMenuItem
-        Caption = '&Delete'
-        Hint = 'Delete|Erases the selection'
-        ImageIndex = 5
-        ShortCut = 46
+        Action = EditDelete1
       end
       object N3: TMenuItem
         Caption = '-'
       end
       object Find1: TMenuItem
-        Caption = '&Find...'
-        Hint = 'Find|Finds the specified text'
-        ImageIndex = 34
-        ShortCut = 16454
-        OnClick = EditFind1Execute
+        Action = FindAction
       end
       object Replace1: TMenuItem
         Caption = '&Replace'
@@ -146,22 +110,16 @@ object FormMain: TFormMain
         Caption = '-'
       end
       object SelectAll1: TMenuItem
-        Caption = 'Select &All'
-        Hint = 'Select All|Selects the entire document'
-        ShortCut = 16449
-        OnClick = EditSelectAll1Execute
+        Action = EditSelectAll1
       end
     end
     object Format1: TMenuItem
       Caption = 'F&ormat'
       object WordWrap1: TMenuItem
-        Caption = 'Word Wrap'
-        OnClick = WordWrap1Click
+        Action = WordWrapAction
       end
       object Font1: TMenuItem
-        Caption = 'Select &Font...'
-        Hint = 'Font Select'
-        OnClick = Font1Click
+        Action = FontSelectAction
       end
     end
   end
@@ -171,6 +129,7 @@ object FormMain: TFormMain
     Top = 184
   end
   object FindDialog1: TFindDialog
+    OnFind = FindDialog1Find
     Left = 368
     Top = 192
   end
@@ -186,5 +145,117 @@ object FormMain: TFormMain
   object SaveDialog1: TSaveDialog
     Left = 456
     Top = 200
+  end
+  object ActionList1: TActionList
+    Left = 144
+    Top = 24
+    object ExitAction: TAction
+      Category = 'File'
+      Caption = 'Exit'
+      Hint = 'Exit the application'
+      ShortCut = 16472
+      OnExecute = ExitActionExecute
+    end
+    object EditCut1: TEditCut
+      Category = 'Edit'
+      Caption = 'Cu&t'
+      Hint = 'Cut|Cuts the selection and puts it on the Clipboard'
+      ImageIndex = 0
+      ShortCut = 16472
+    end
+    object EditCopy1: TEditCopy
+      Category = 'Edit'
+      Caption = '&Copy'
+      Hint = 'Copy|Copies the selection and puts it on the Clipboard'
+      ImageIndex = 1
+      ShortCut = 16451
+    end
+    object EditPaste1: TEditPaste
+      Category = 'Edit'
+      Caption = '&Paste'
+      Hint = 'Paste|Inserts Clipboard contents'
+      ImageIndex = 2
+      ShortCut = 16470
+    end
+    object EditSelectAll1: TEditSelectAll
+      Category = 'Edit'
+      Caption = 'Select &All'
+      Hint = 'Select All|Selects the entire document'
+      ShortCut = 16449
+    end
+    object EditUndo1: TEditUndo
+      Category = 'Edit'
+      Caption = '&Undo'
+      Hint = 'Undo|Reverts the last action'
+      ImageIndex = 3
+      ShortCut = 16474
+    end
+    object EditDelete1: TEditDelete
+      Category = 'Edit'
+      Caption = '&Delete'
+      Hint = 'Delete|Erases the selection'
+      ImageIndex = 5
+      ShortCut = 46
+    end
+    object OpenAction: TAction
+      Category = 'File'
+      Caption = '&Open ...'
+      Hint = 'Opens a file'
+      ShortCut = 16463
+      OnExecute = OpenActionExecute
+    end
+    object WordWrapAction: TAction
+      Caption = 'Word Wrap'
+      OnExecute = WordWrapActionExecute
+    end
+    object NewAction: TAction
+      Category = 'File'
+      Caption = 'New'
+      ShortCut = 16462
+      OnExecute = NewActionExecute
+    end
+    object SaveAction: TAction
+      Category = 'File'
+      Caption = '&Save'
+      ShortCut = 16467
+      OnExecute = SaveActionExecute
+    end
+    object SaveAsAction: TAction
+      Category = 'File'
+      Caption = 'S&ave As ...'
+      Hint = 'Choose name and save file'
+      OnExecute = SaveAsActionExecute
+    end
+    object FilePageSetup1: TFilePageSetup
+      Category = 'File'
+      Caption = 'Page Set&up...'
+      Dialog.MinMarginLeft = 0
+      Dialog.MinMarginTop = 0
+      Dialog.MinMarginRight = 0
+      Dialog.MinMarginBottom = 0
+      Dialog.MarginLeft = 1000
+      Dialog.MarginTop = 1000
+      Dialog.MarginRight = 1000
+      Dialog.MarginBottom = 1000
+      Dialog.PageWidth = 8500
+      Dialog.PageHeight = 11000
+    end
+    object FilePrintSetup1: TFilePrintSetup
+      Category = 'File'
+      Caption = 'Print Set&up...'
+      Hint = 'Print Setup'
+    end
+    object FontSelectAction: TAction
+      Category = 'Format'
+      Caption = 'Select Font'
+      Hint = 'Select font'
+      OnExecute = FontSelectActionExecute
+    end
+    object FindAction: TAction
+      Category = 'Edit'
+      Caption = '&Find...'
+      ShortCut = 16454
+      OnExecute = FindActionExecute
+    end
   end
 end
