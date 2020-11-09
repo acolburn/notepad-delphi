@@ -59,6 +59,7 @@ type
     FilePrintSetup1: TFilePrintSetup;
     FontSelectAction: TAction;
     FindAction: TAction;
+    ReplaceDialog1: TReplaceDialog;
     procedure ExitActionExecute(Sender: TObject);
     procedure OpenActionExecute(Sender: TObject);
     procedure NewActionExecute(Sender: TObject);
@@ -72,6 +73,10 @@ type
     procedure Memo1Change(Sender: TObject);
     procedure FindActionExecute(Sender: TObject);
     procedure FindDialog1Find(Sender: TObject);
+    procedure Replace1Click(Sender: TObject);
+    procedure ReplaceDialog1Replace(Sender: TObject);
+    procedure Memo1KeyPress(Sender: TObject; var Key: Char);
+    procedure EditDelete1Execute(Sender: TObject);
   private
     { Private declarations }
     FOpenedFile: string;
@@ -114,6 +119,16 @@ begin
   end;
 end;
 
+procedure TFormMain.EditDelete1Execute(Sender: TObject);
+begin
+  //if you're just pressing the delete key, want to delete character
+  //to the right of the cursor
+  if Memo1.SelLength = 0 then
+    Memo1.SelLength := 1;
+  //delete whatever's highlighted, replace it with blank
+  Memo1.SelText := '';
+end;
+
 procedure TFormMain.ExitActionExecute(Sender: TObject);
 begin
   self.Close;
@@ -121,12 +136,12 @@ end;
 
 procedure TFormMain.FindActionExecute(Sender: TObject);
 begin
-FSelPos := 0;
+  FSelPos := 0;
   FindDialog1.Execute;
 end;
 
 procedure TFormMain.FindDialog1Find(Sender: TObject);
-//http://www.delphigroups.info/2/09/310962.html
+// http://www.delphigroups.info/2/09/310962.html
 var
   s: string;
   startpos: integer;
@@ -177,26 +192,26 @@ end;
 
 procedure TFormMain.FontSelectActionExecute(Sender: TObject);
 begin
-FontDialog1.Font.Name := Memo1.Font.Name;
-  FontDialog1.Font.Size:=Memo1.Font.Size;
-  FontDialog1.Font.Style:=Memo1.Font.Style;
+  FontDialog1.Font.Name := Memo1.Font.Name;
+  FontDialog1.Font.Size := Memo1.Font.Size;
+  FontDialog1.Font.Style := Memo1.Font.Style;
   if FontDialog1.Execute then
     Memo1.Font := FontDialog1.Font;
 end;
 
 procedure TFormMain.FormClose(Sender: TObject; var Action: TCloseAction);
 begin
-CloseIni;
+  CloseIni;
 end;
 
 procedure TFormMain.FormCloseQuery(Sender: TObject; var CanClose: Boolean);
 begin
-CanClose := DocumentChanged;
+  CanClose := DocumentChanged;
 end;
 
 procedure TFormMain.FormCreate(Sender: TObject);
 begin
-LoadIni;
+  LoadIni;
   // Make sure WordWrap menu item properly checked
   WordWrap1.Checked := Memo1.WordWrap;
 end;
@@ -281,9 +296,29 @@ begin
   StatusBar1.Panels[0].Text := 'Words: ' + IntToStr(count);
 end;
 
+procedure TFormMain.Memo1KeyPress(Sender: TObject; var Key: Char);
+var
+  currentPos, lineY: integer;
+begin
+  // https://www.thoughtco.com/understanding-keyboard-events-in-delphi-1058213
+  if Key = Chr(VK_ESCAPE) then
+  begin
+    // showmessage('esc pressed'); //works ok
+    lineY := Memo1.CaretPos.Y + 1;
+    // lineX:=memo1.CaretPos.X;
+    currentPos := Memo1.SelStart;
+    Memo1.SelStart := Perform(EM_LINEINDEX, lineY, 0) + Memo1.SelStart;
+    // https://blog.dummzeuch.de/2016/01/16/automatically-scroll-a-memo-line-by-line-in-delphi/
+    // SendMessage(Memo1.Handle,WM_VSCROLL,SB_LINEDOWN,0);
+    // SendMessage(Memo1.Handle,EM_LINESCROLL,0,1);
+
+  end;
+
+end;
+
 procedure TFormMain.NewActionExecute(Sender: TObject);
 begin
-   if Memo1.Text <> '' then
+  if Memo1.Text <> '' then
     case MessageDlg('Do you want to save the changes to this file?', mtWarning,
       mbYesNoCancel, 0) of
       mrYes:
@@ -296,12 +331,51 @@ end;
 
 procedure TFormMain.OpenActionExecute(Sender: TObject);
 begin
-   self.DocumentChanged;
-   OpenDialog1.Execute;
+  self.DocumentChanged;
+  OpenDialog1.Execute;
   if OpenDialog1.FileName <> '' then
   begin
     Memo1.Lines.LoadFromFile(OpenDialog1.FileName);
     FOpenedFile := OpenDialog1.FileName;
+  end;
+end;
+
+procedure TFormMain.Replace1Click(Sender: TObject);
+begin
+  FSelPos := 0;
+  ReplaceDialog1.Execute;
+end;
+
+procedure TFormMain.ReplaceDialog1Replace(Sender: TObject);
+// http://docs.embarcadero.com/products/rad_studio/delphiAndcpp2009/HelpUpdate2/EN/html/delphivclwin32/Dialogs_TReplaceDialog_OnReplace.html
+{
+  The following event handler searches a TMemo object called
+  Memo1 and replaces FindText with ReplaceText. It uses
+  TMemo’s SelStart, SelLength, and SelText properties.
+}
+var
+  SelPos: integer;
+begin
+  with TReplaceDialog(Sender) do
+  begin
+    { Perform a global case-sensitive search for FindText in Memo1 }
+    while SelPos < Memo1.Lines.Text.Length - 1 do
+    begin
+      SelPos := Pos(Findtext, Memo1.Lines.Text);
+      if SelPos > 0 then
+      begin
+        Memo1.SelStart := SelPos - 1;
+        Memo1.SelLength := Length(ReplaceDialog1.Findtext);
+        { Replace selected text with ReplaceText }
+        Memo1.SelText := ReplaceDialog1.ReplaceText;
+      end
+      else
+      begin
+        MessageDlg(Concat('Could not find "', Findtext, '" in Memo1.'), mtError,
+          [mbOK], 0);
+        SelPos := Memo1.Lines.Text.Length;
+      end;
+    end;
   end;
 end;
 
@@ -315,7 +389,7 @@ end;
 
 procedure TFormMain.SaveAsActionExecute(Sender: TObject);
 begin
-   SaveDialog1.Execute;
+  SaveDialog1.Execute;
   if SaveDialog1.FileName <> '' then // checking to assure user selected a file
     Memo1.Lines.SaveToFile(SaveDialog1.FileName);
 end;

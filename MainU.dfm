@@ -42,6 +42,7 @@ object FormMain: TFormMain
     ScrollBars = ssVertical
     TabOrder = 1
     OnChange = Memo1Change
+    OnKeyPress = Memo1KeyPress
   end
   object MainMenu1: TMainMenu
     Left = 32
@@ -91,7 +92,11 @@ object FormMain: TFormMain
         Action = EditPaste1
       end
       object Delete1: TMenuItem
-        Action = EditDelete1
+        Caption = '&Delete'
+        Hint = 'Delete|Erases the selection'
+        ImageIndex = 5
+        ShortCut = 46
+        OnClick = EditDelete1Execute
       end
       object N3: TMenuItem
         Caption = '-'
@@ -103,6 +108,7 @@ object FormMain: TFormMain
         Caption = '&Replace'
         Hint = 'Replace|Replaces specific text with different text'
         ImageIndex = 32
+        OnClick = Replace1Click
       end
       object N4: TMenuItem
         Caption = '-'
@@ -141,6 +147,7 @@ object FormMain: TFormMain
     Top = 176
   end
   object SaveDialog1: TSaveDialog
+    DefaultExt = 'txt'
     Left = 456
     Top = 200
   end
@@ -194,6 +201,7 @@ object FormMain: TFormMain
       Hint = 'Delete|Erases the selection'
       ImageIndex = 5
       ShortCut = 46
+      OnExecute = EditDelete1Execute
     end
     object OpenAction: TAction
       Category = 'File'
@@ -255,5 +263,11 @@ object FormMain: TFormMain
       ShortCut = 16454
       OnExecute = FindActionExecute
     end
+  end
+  object ReplaceDialog1: TReplaceDialog
+    Options = [frDown, frFindNext, frReplace, frReplaceAll]
+    OnReplace = ReplaceDialog1Replace
+    Left = 320
+    Top = 232
   end
 end
