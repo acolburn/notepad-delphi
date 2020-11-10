@@ -43,6 +43,7 @@ object FormMain: TFormMain
     TabOrder = 1
     OnChange = Memo1Change
     OnKeyPress = Memo1KeyPress
+    ExplicitTop = -6
   end
   object MainMenu1: TMainMenu
     Left = 32
@@ -72,6 +73,7 @@ object FormMain: TFormMain
       end
       object Exit1: TMenuItem
         Action = ExitAction
+        ShortCut = 16465
       end
     end
     object Edit1: TMenuItem
