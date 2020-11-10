@@ -10,6 +10,8 @@ uses
   Vcl.ActnMan, Vcl.PlatformDefaultStyleActnCtrls;
 
 type
+  TMode = (insert, command);
+
   TFormMain = class(TForm)
     StatusBar1: TStatusBar;
     MainMenu1: TMainMenu;
@@ -81,7 +83,10 @@ type
     { Private declarations }
     FOpenedFile: string;
     FSelPos: integer;
+    FMode: TMode; // insert mode or command mode
+    FWordCount: integer;
     function DocumentChanged: Boolean;
+    procedure UpdateDisplay;
     procedure LoadIni;
     procedure CloseIni;
   public
@@ -107,7 +112,7 @@ begin
   else
     s := 'this file';
   Result := True;
-  if Memo1.Modified and not (Memo1.Text = '') then
+  if Memo1.Modified and not(Memo1.Text = '') then
   begin
     case MessageDlg('Do you want to save the changes to ' + s + '?', mtWarning,
       mbYesNoCancel, 0) of
@@ -214,6 +219,8 @@ begin
   LoadIni;
   // Make sure WordWrap menu item properly checked
   WordWrap1.Checked := Memo1.WordWrap;
+  // Start in normal, insert mode
+  FMode := TMode.insert;
 end;
 
 procedure TFormMain.LoadIni;
@@ -275,38 +282,48 @@ begin
 
   end;
 
-  // for i := 1 to Length(s) do
-  // begin
-  // // if the char is a delimiter, you're at the end of a word; increase the count
-  // if ((s[i] in wordSeparatorSet) and (inWord=True)) then
-  // begin
-  // Inc(count);
-  // inWord := False;
-  // end
-  // else
-  // // the char is not a delimiter, so you're in a word
-  // begin
-  // inWord := True;
-  // end;
-  // end;
-  // // OK, all done counting. If you're still inside a word, don't forget to count it too
-  // if inWord then
-  // Inc(count);
+  FWordCount := count;
+  UpdateDisplay;
 
-  StatusBar1.Panels[0].Text := 'Words: ' + IntToStr(count);
 end;
 
 procedure TFormMain.Memo1KeyPress(Sender: TObject; var Key: Char);
-var
-  currentPos, lineY: integer;
 begin
   // https://www.thoughtco.com/understanding-keyboard-events-in-delphi-1058213
   if Key = Chr(VK_ESCAPE) then
   begin
-    keybd_event(VK_DOWN, 0, 0, 0); // KEYEVENTF_KEYDOWN=0
-    keybd_event(VK_DOWN, 0, KEYEVENTF_KEYUP, 0);
-
+    if FMode = insert then
+      FMode := command
+    else if FMode = command then
+      FMode := insert;
+    UpdateDisplay;
   end;
+
+  if FMode = command then
+  begin
+    if Key = 'j' then
+    begin
+      keybd_event(VK_DOWN, 0, 0, 0); // KEYEVENTF_KEYDOWN=0
+      keybd_event(VK_DOWN, 0, KEYEVENTF_KEYUP, 0);
+    end;
+     if Key = 'k' then
+     begin
+      keybd_event(VK_UP, 0, 0, 0); // KEYEVENTF_KEYDOWN=0
+      keybd_event(VK_UP, 0, KEYEVENTF_KEYUP, 0);
+    end;
+    if Key = 'l' then
+     begin
+      keybd_event(VK_RIGHT, 0, 0, 0); // KEYEVENTF_KEYDOWN=0
+      keybd_event(VK_RIGHT, 0, KEYEVENTF_KEYUP, 0);
+    end;
+    if Key = 'h' then
+     begin
+      keybd_event(VK_LEFT, 0, 0, 0); // KEYEVENTF_KEYDOWN=0
+      keybd_event(VK_LEFT, 0, KEYEVENTF_KEYUP, 0);
+    end;
+    Key:=#0;
+  end;
+
 end;
 
 procedure TFormMain.NewActionExecute(Sender: TObject);
@@ -387,10 +404,23 @@ begin
     Memo1.Lines.SaveToFile(SaveDialog1.FileName);
 end;
 
+procedure TFormMain.UpdateDisplay;
+begin
+  // What the status bar panels should say
+  StatusBar1.Panels[0].Text := 'Words: ' + IntToStr(FWordCount);
+  if FMode = insert then
+    StatusBar1.Panels[1].Text := 'INS';
+  if FMode = command then
+    StatusBar1.Panels[1].Text := 'COMMAND';
+  // Whether the word wrap menu entry should be checked
+  WordWrap1.Checked := Memo1.WordWrap;
+
+end;
+
 procedure TFormMain.WordWrapActionExecute(Sender: TObject);
 begin
   Memo1.WordWrap := not Memo1.WordWrap;
-  WordWrap1.Checked := Memo1.WordWrap;
+  UpdateDisplay;
 end;
 
 procedure TFormMain.CloseIni;

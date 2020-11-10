@@ -24,6 +24,10 @@ object FormMain: TFormMain
     Height = 19
     Panels = <
       item
+        Width = 200
+      end
+      item
+        Text = 'INS'
         Width = 50
       end>
   end
@@ -43,7 +47,6 @@ object FormMain: TFormMain
     TabOrder = 1
     OnChange = Memo1Change
     OnKeyPress = Memo1KeyPress
-    ExplicitTop = -6
   end
   object MainMenu1: TMainMenu
     Left = 32
@@ -158,7 +161,7 @@ object FormMain: TFormMain
     Top = 24
     object ExitAction: TAction
       Category = 'File'
-      Caption = 'Exit'
+      Caption = 'E&xit'
       Hint = 'Exit the application'
       ShortCut = 16472
       OnExecute = ExitActionExecute

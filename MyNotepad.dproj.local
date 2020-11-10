@@ -2,10 +2,10 @@
 <BorlandProject>
 	<Transactions>
     <Transaction>2020/11/01 09:26:43.000.821,=D:\Code_Delphi\Unit3.pas</Transaction>
-    <Transaction>2020/11/01 09:27:01.000.211,D:\Code_Delphi\MainU.pas=D:\Code_Delphi\Unit3.pas</Transaction>
-    <Transaction>2020/11/01 09:27:01.000.211,D:\Code_Delphi\MainU.dfm=D:\Code_Delphi\Unit3.dfm</Transaction>
-    <Transaction>2020/11/01 09:28:09.000.270,D:\Code_Delphi\Notepad\MyNotepad.dproj=D:\Code_Delphi\Project2.dproj</Transaction>
-    <Transaction>2020/11/01 09:28:32.000.023,D:\Code_Delphi\Notepad\MainU.pas=D:\Code_Delphi\MainU.pas</Transaction>
-    <Transaction>2020/11/01 09:28:32.000.023,D:\Code_Delphi\Notepad\MainU.dfm=D:\Code_Delphi\MainU.dfm</Transaction>
+    <Transaction>2020/11/01 09:27:01.000.211,D:\Code_Delphi\Unit3.dfm=D:\Code_Delphi\MainU.dfm</Transaction>
+    <Transaction>2020/11/01 09:27:01.000.211,D:\Code_Delphi\Unit3.pas=D:\Code_Delphi\MainU.pas</Transaction>
+    <Transaction>2020/11/01 09:28:09.000.270,D:\Code_Delphi\Project2.dproj=D:\Code_Delphi\Notepad\MyNotepad.dproj</Transaction>
+    <Transaction>2020/11/01 09:28:32.000.023,D:\Code_Delphi\MainU.pas=D:\Code_Delphi\Notepad\MainU.pas</Transaction>
+    <Transaction>2020/11/01 09:28:32.000.023,D:\Code_Delphi\MainU.dfm=D:\Code_Delphi\Notepad\MainU.dfm</Transaction>
   </Transactions>
 </BorlandProject>
