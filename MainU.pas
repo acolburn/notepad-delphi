@@ -107,7 +107,7 @@ begin
   else
     s := 'this file';
   Result := True;
-  if Memo1.Modified then
+  if Memo1.Modified and not (Memo1.Text = '') then
   begin
     case MessageDlg('Do you want to save the changes to ' + s + '?', mtWarning,
       mbYesNoCancel, 0) of
@@ -121,11 +121,11 @@ end;
 
 procedure TFormMain.EditDelete1Execute(Sender: TObject);
 begin
-  //if you're just pressing the delete key, want to delete character
-  //to the right of the cursor
+  // if you're just pressing the delete key, want to delete character
+  // to the right of the cursor
   if Memo1.SelLength = 0 then
     Memo1.SelLength := 1;
-  //delete whatever's highlighted, replace it with blank
+  // delete whatever's highlighted, replace it with blank
   Memo1.SelText := '';
 end;
 
@@ -303,17 +303,10 @@ begin
   // https://www.thoughtco.com/understanding-keyboard-events-in-delphi-1058213
   if Key = Chr(VK_ESCAPE) then
   begin
-    // showmessage('esc pressed'); //works ok
-    lineY := Memo1.CaretPos.Y + 1;
-    // lineX:=memo1.CaretPos.X;
-    currentPos := Memo1.SelStart;
-    Memo1.SelStart := Perform(EM_LINEINDEX, lineY, 0) + Memo1.SelStart;
-    // https://blog.dummzeuch.de/2016/01/16/automatically-scroll-a-memo-line-by-line-in-delphi/
-    // SendMessage(Memo1.Handle,WM_VSCROLL,SB_LINEDOWN,0);
-    // SendMessage(Memo1.Handle,EM_LINESCROLL,0,1);
+    keybd_event(VK_DOWN, 0, 0, 0); // KEYEVENTF_KEYDOWN=0
+    keybd_event(VK_DOWN, 0, KEYEVENTF_KEYUP, 0);
 
   end;
-
 end;
 
 procedure TFormMain.NewActionExecute(Sender: TObject);
