@@ -130,12 +130,12 @@ end;
 
 procedure TFormMain.DropFileTarget1Drop(Sender: TObject;
   ShiftState: TShiftState; APoint: TPoint; var Effect: Integer);
-  //https://github.com/landrix/The-Drag-and-Drop-Component-Suite-for-Delphi/blob/master/Demos/TargetDemo/Main.pas
+// https://github.com/landrix/The-Drag-and-Drop-Component-Suite-for-Delphi/blob/master/Demos/TargetDemo/Main.pas
 begin
   if FileExists(DropFileTarget1.Files[0]) then
   begin
     Memo1.Lines.LoadFromFile(DropFileTarget1.Files[0]);
-    FOpenedFile:=DropFileTarget1.Files[0];
+    FOpenedFile := DropFileTarget1.Files[0];
   end;
 
 end;
@@ -317,6 +317,11 @@ begin
 
   if FMode = command then
   begin
+    if Key = 'i' then
+    begin
+      FMode := insert;
+      UpdateDisplay;
+    end;
     if Key = 'j' then
     begin
       keybd_event(VK_DOWN, 0, 0, 0); // KEYEVENTF_KEYDOWN=0
@@ -337,7 +342,7 @@ begin
       keybd_event(VK_LEFT, 0, 0, 0); // KEYEVENTF_KEYDOWN=0
       keybd_event(VK_LEFT, 0, KEYEVENTF_KEYUP, 0);
     end;
-    Key := #0;
+    Key := #0; // So the j, k, l, etc. isn't printed
   end;
 
 end;
