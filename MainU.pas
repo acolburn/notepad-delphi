@@ -7,7 +7,8 @@ uses
   System.Classes, Vcl.Graphics,
   Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.ComCtrls, Vcl.Menus, Vcl.StdCtrls,
   Vcl.StdActns, Vcl.ActnList, System.Actions, IniFiles,
-  Vcl.ActnMan, Vcl.PlatformDefaultStyleActnCtrls;
+  Vcl.ActnMan, Vcl.PlatformDefaultStyleActnCtrls, DragDrop, DropTarget,
+  DragDropFile;
 
 type
   TMode = (insert, command);
@@ -62,6 +63,7 @@ type
     FontSelectAction: TAction;
     FindAction: TAction;
     ReplaceDialog1: TReplaceDialog;
+    DropFileTarget1: TDropFileTarget;
     procedure ExitActionExecute(Sender: TObject);
     procedure OpenActionExecute(Sender: TObject);
     procedure NewActionExecute(Sender: TObject);
@@ -79,12 +81,14 @@ type
     procedure ReplaceDialog1Replace(Sender: TObject);
     procedure Memo1KeyPress(Sender: TObject; var Key: Char);
     procedure EditDelete1Execute(Sender: TObject);
+    procedure DropFileTarget1Drop(Sender: TObject; ShiftState: TShiftState;
+      APoint: TPoint; var Effect: Integer);
   private
     { Private declarations }
     FOpenedFile: string;
-    FSelPos: integer;
+    FSelPos: Integer;
     FMode: TMode; // insert mode or command mode
-    FWordCount: integer;
+    FWordCount: Integer;
     function DocumentChanged: Boolean;
     procedure UpdateDisplay;
     procedure LoadIni;
@@ -124,6 +128,15 @@ begin
   end;
 end;
 
+procedure TFormMain.DropFileTarget1Drop(Sender: TObject;
+  ShiftState: TShiftState; APoint: TPoint; var Effect: Integer);
+  //https://github.com/landrix/The-Drag-and-Drop-Component-Suite-for-Delphi/blob/master/Demos/TargetDemo/Main.pas
+begin
+  if FileExists(DropFileTarget1.Files[0]) then
+    Memo1.Lines.LoadFromFile(DropFileTarget1.Files[0]);
+
+end;
+
 procedure TFormMain.EditDelete1Execute(Sender: TObject);
 begin
   // if you're just pressing the delete key, want to delete character
@@ -149,7 +162,7 @@ procedure TFormMain.FindDialog1Find(Sender: TObject);
 // http://www.delphigroups.info/2/09/310962.html
 var
   s: string;
-  startpos: integer;
+  startpos: Integer;
 begin
   with TFindDialog(Sender) do
   begin
@@ -252,8 +265,8 @@ procedure TFormMain.Memo1Change(Sender: TObject);
 // https://stackoverflow.com/questions/64669235/how-to-accurately-count-words-in-a-memo
 var
   // wordSeparatorSet: Set of Char;
-  count: integer;
-  i: integer;
+  count: Integer;
+  i: Integer;
   s: string;
   inWord: Boolean;
 begin
@@ -306,22 +319,22 @@ begin
       keybd_event(VK_DOWN, 0, 0, 0); // KEYEVENTF_KEYDOWN=0
       keybd_event(VK_DOWN, 0, KEYEVENTF_KEYUP, 0);
     end;
-     if Key = 'k' then
-     begin
+    if Key = 'k' then
+    begin
       keybd_event(VK_UP, 0, 0, 0); // KEYEVENTF_KEYDOWN=0
       keybd_event(VK_UP, 0, KEYEVENTF_KEYUP, 0);
     end;
     if Key = 'l' then
-     begin
+    begin
       keybd_event(VK_RIGHT, 0, 0, 0); // KEYEVENTF_KEYDOWN=0
       keybd_event(VK_RIGHT, 0, KEYEVENTF_KEYUP, 0);
     end;
     if Key = 'h' then
-     begin
+    begin
       keybd_event(VK_LEFT, 0, 0, 0); // KEYEVENTF_KEYDOWN=0
       keybd_event(VK_LEFT, 0, KEYEVENTF_KEYUP, 0);
     end;
-    Key:=#0;
+    Key := #0;
   end;
 
 end;
@@ -364,7 +377,7 @@ procedure TFormMain.ReplaceDialog1Replace(Sender: TObject);
   TMemo’s SelStart, SelLength, and SelText properties.
 }
 var
-  SelPos: integer;
+  SelPos: Integer;
 begin
   with TReplaceDialog(Sender) do
   begin

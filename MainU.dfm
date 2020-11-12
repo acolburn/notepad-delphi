@@ -275,4 +275,13 @@ object FormMain: TFormMain
     Left = 320
     Top = 232
   end
+  object DropFileTarget1: TDropFileTarget
+    DragTypes = [dtCopy, dtLink]
+    OnDrop = DropFileTarget1Drop
+    Target = Memo1
+    WinTarget = 0
+    OptimizedMove = True
+    Left = 544
+    Top = 40
+  end
 end
