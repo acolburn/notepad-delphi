@@ -133,7 +133,10 @@ procedure TFormMain.DropFileTarget1Drop(Sender: TObject;
   //https://github.com/landrix/The-Drag-and-Drop-Component-Suite-for-Delphi/blob/master/Demos/TargetDemo/Main.pas
 begin
   if FileExists(DropFileTarget1.Files[0]) then
+  begin
     Memo1.Lines.LoadFromFile(DropFileTarget1.Files[0]);
+    FOpenedFile:=DropFileTarget1.Files[0];
+  end;
 
 end;
 
