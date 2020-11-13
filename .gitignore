@@ -67,3 +67,7 @@ __recovery/
 
 # Boss dependency manager vendor folder https://github.com/HashLoad/boss
 modules/
+Win32/Release/config.ini
+*.ini
+*.dcu
+*.exe
