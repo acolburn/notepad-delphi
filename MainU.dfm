@@ -46,6 +46,7 @@ object FormMain: TFormMain
     ScrollBars = ssVertical
     TabOrder = 1
     OnChange = Memo1Change
+    OnClick = Memo1Click
     OnKeyPress = Memo1KeyPress
   end
   object MainMenu1: TMainMenu

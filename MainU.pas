@@ -83,6 +83,7 @@ type
     procedure EditDelete1Execute(Sender: TObject);
     procedure DropFileTarget1Drop(Sender: TObject; ShiftState: TShiftState;
       APoint: TPoint; var Effect: Integer);
+    procedure Memo1Click(Sender: TObject);
   private
     { Private declarations }
     FOpenedFile: string;
@@ -301,6 +302,15 @@ begin
   FWordCount := count;
   UpdateDisplay;
 
+end;
+
+procedure TFormMain.Memo1Click(Sender: TObject);
+begin
+  if FMode = command then
+  begin
+    FMode := insert;
+    UpdateDisplay;
+  end;
 end;
 
 procedure TFormMain.Memo1KeyPress(Sender: TObject; var Key: Char);
