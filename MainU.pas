@@ -24,8 +24,6 @@ type
     Save1: TMenuItem;
     SaveAs1: TMenuItem;
     N1: TMenuItem;
-    PageSetup1: TMenuItem;
-    PrintSetup1: TMenuItem;
     Exit1: TMenuItem;
     Undo1: TMenuItem;
     N2: TMenuItem;

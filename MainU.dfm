@@ -69,12 +69,6 @@ object FormMain: TFormMain
       object N1: TMenuItem
         Action = OpenAction
       end
-      object PageSetup1: TMenuItem
-        Action = FilePageSetup1
-      end
-      object PrintSetup1: TMenuItem
-        Action = FilePrintSetup1
-      end
       object Exit1: TMenuItem
         Action = ExitAction
         ShortCut = 16465
