@@ -215,6 +215,7 @@ begin
   FontDialog1.Font.Name := Memo1.Font.Name;
   FontDialog1.Font.Size := Memo1.Font.Size;
   FontDialog1.Font.Style := Memo1.Font.Style;
+  FontDialog1.Font.Color := Memo1.Font.Color;
   if FontDialog1.Execute then
     Memo1.Font := FontDialog1.Font;
 end;
@@ -241,25 +242,23 @@ end;
 procedure TFormMain.LoadIni;
 var
   AIniFile: TIniFile;
-  myFont: TFont;
 begin
   try
-    myFont := TFont.Create;
     AIniFile := TIniFile.Create(ExtractFilePath(Application.EXEName) +
       'config.ini');
     with AIniFile do
     begin
-      FormMain.Left := AIniFile.ReadInteger('Config', 'Left', 10);
-      FormMain.Top := AIniFile.ReadInteger('Config', 'Top', 10);
-      FormMain.Width := AIniFile.ReadInteger('Config', 'Width', 613);
-      FormMain.Height := AIniFile.ReadInteger('Config', 'Height', 496);
-      myFont.Size := AIniFile.ReadInteger('Config', 'FontSize', 12);
-      myFont.Name := AIniFile.ReadString('Config', 'FontName', 'Consolas');
+      FormMain.Left := AIniFile.ReadInteger('Form', 'Left', 10);
+      FormMain.Top := AIniFile.ReadInteger('Form', 'Top', 10);
+      FormMain.Width := AIniFile.ReadInteger('form', 'Width', 613);
+      FormMain.Height := AIniFile.ReadInteger('Form', 'Height', 496);
+      Memo1.Font.Size := AIniFile.ReadInteger('Font', 'Size', 12);
+      Memo1.Font.Name := AIniFile.ReadString('Font', 'Name', 'Consolas');
+      Memo1.Font.Color := TColor(AIniFile.ReadInteger('Font', 'Color', Memo1.Font.Color));
+      Memo1.Font.Style := TFontStyles(Byte(AIniFile.ReadInteger('Font', 'Style', Byte(Memo1.Font.Style))));
     end;
   finally
-    Memo1.Font := myFont;
     AIniFile.Free;
-    myFont.Free;
   end;
 end;
 
@@ -461,12 +460,14 @@ begin
       'config.ini');
     with AIniFile do
     begin
-      WriteInteger('Config', 'Left', Left);
-      WriteInteger('Config', 'Top', Top);
-      WriteInteger('Config', 'Width', Width);
-      WriteInteger('Config', 'Height', Height);
-      WriteInteger('Config', 'FontSize', Memo1.Font.Size);
-      WriteString('Config', 'FontName', Memo1.Font.Name);
+      WriteInteger('Form', 'Left', Left);
+      WriteInteger('Form', 'Top', Top);
+      WriteInteger('Form', 'Width', Width);
+      WriteInteger('Form', 'Height', Height);
+      WriteInteger('Font', 'Size', Memo1.Font.Size);
+      WriteString('Font', 'Name', Memo1.Font.Name);
+      WriteInteger('Font', 'Color', Memo1.Font.Color);
+      WriteInteger('Font', 'Style', Byte(Memo1.Font.Style));
     end;
   finally
     AIniFile.Free;
