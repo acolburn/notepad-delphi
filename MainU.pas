@@ -321,7 +321,9 @@ procedure TFormMain.Memo1KeyDown(Sender: TObject; var Key: Word;
 begin
   if Key=VK_F5 then
   begin
-    Memo1.Lines.Add(FormatDateTime('h:nn',now));
+    //Memo1.Lines.Add(FormatDateTime('h:nn',now));...includes unwanted CRLF after entering time
+    Memo1.Text:=Memo1.Text+FormatDateTime('h:nn',now); //adds time to end of doc, cursor goes to start
+    Memo1.SelStart:=Memo1.GetTextLen;  //cursor goes to end
   end;
 end;
 
