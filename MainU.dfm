@@ -47,6 +47,7 @@ object FormMain: TFormMain
     TabOrder = 1
     OnChange = Memo1Change
     OnClick = Memo1Click
+    OnKeyDown = Memo1KeyDown
     OnKeyPress = Memo1KeyPress
   end
   object MainMenu1: TMainMenu
@@ -129,6 +130,7 @@ object FormMain: TFormMain
   end
   object OpenDialog1: TOpenDialog
     DefaultExt = 'txt'
+    Filter = 'text file|.txt|any file|*.*'
     Left = 312
     Top = 184
   end

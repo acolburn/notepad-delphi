@@ -82,6 +82,7 @@ type
     procedure DropFileTarget1Drop(Sender: TObject; ShiftState: TShiftState;
       APoint: TPoint; var Effect: Integer);
     procedure Memo1Click(Sender: TObject);
+    procedure Memo1KeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
   private
     { Private declarations }
     FOpenedFile: string;
@@ -310,6 +311,17 @@ begin
   begin
     FMode := insert;
     UpdateDisplay;
+  end;
+end;
+
+procedure TFormMain.Memo1KeyDown(Sender: TObject; var Key: Word;
+  Shift: TShiftState);
+  //https://stackoverflow.com/questions/65113295/how-to-recognize-virtual-key-codes-in-keypress-event
+  //KeyDown recognizes *any* key being pressed, KeyPress recognizes character keys
+begin
+  if Key=VK_F5 then
+  begin
+    Memo1.Lines.Add(FormatDateTime('h:nn',now));
   end;
 end;
 
