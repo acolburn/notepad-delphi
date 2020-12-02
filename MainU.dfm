@@ -148,6 +148,7 @@ object FormMain: TFormMain
   end
   object SaveDialog1: TSaveDialog
     DefaultExt = 'txt'
+    Filter = 'text file|.txt|any file|*.*'
     Left = 456
     Top = 200
   end

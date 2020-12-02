@@ -120,7 +120,10 @@ begin
     case MessageDlg('Do you want to save the changes to ' + s + '?', mtWarning,
       mbYesNoCancel, 0) of
       mrYes:
+      begin
         SaveActionExecute(self);
+        Result := False;
+      end;
       mrCancel:
         Result := False;
     end;
@@ -423,6 +426,8 @@ begin
     Memo1.Lines.SaveToFile(FOpenedFile)
   else
     self.SaveAsActionExecute(Sender);
+  Memo1.Modified:=false;
+
 end;
 
 procedure TFormMain.SaveAsActionExecute(Sender: TObject);
@@ -475,3 +480,6 @@ begin
 end;
 
 end.
+
+
+
