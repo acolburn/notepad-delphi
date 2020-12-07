@@ -449,6 +449,7 @@ begin
   SaveDialog1.Execute;
   if SaveDialog1.FileName <> '' then // checking to assure user selected a file
     Memo1.Lines.SaveToFile(SaveDialog1.FileName);
+    Memo1.Modified:=false;
 end;
 
 procedure TFormMain.UpdateDisplay;
